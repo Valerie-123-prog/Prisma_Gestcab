@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Calendar, FileText, Activity } from "lucide-react";
+import { Users, Calendar, Receipt, FileText, Activity } from "lucide-react";
 
 const Index = () => {
   return (
@@ -14,12 +14,12 @@ const Index = () => {
             Système de Gestion Médicale
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Une solution complète pour la gestion des patients, des rendez-vous et des dossiers médicaux
+            Une solution complète pour la gestion des patients, des rendez-vous, de la facturation et des dossiers médicaux
           </p>
         </div>
 
         {/* Modules principaux */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <Link to="/patients">
             <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
               <CardHeader>
@@ -64,10 +64,32 @@ const Index = () => {
             </Card>
           </Link>
 
+          <Link to="/billing">
+            <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Receipt className="h-6 w-6 text-purple-600" />
+                  Gestion de la Facturation
+                </CardTitle>
+                <CardDescription>
+                  Facturation et suivi des paiements
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li>• Création de factures</li>
+                  <li>• Gestion des paiements</li>
+                  <li>• Statistiques financières</li>
+                  <li>• Export PDF</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
+
           <Card className="h-full opacity-75">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileText className="h-6 w-6 text-purple-600" />
+                <FileText className="h-6 w-6 text-orange-600" />
                 Rapports et Statistiques
               </CardTitle>
               <CardDescription>
@@ -88,7 +110,7 @@ const Index = () => {
         {/* Actions rapides */}
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-semibold mb-6 text-center">Actions Rapides</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link to="/patients">
               <Button className="w-full h-16 text-lg">
                 <Users className="mr-2 h-5 w-5" />
@@ -99,6 +121,12 @@ const Index = () => {
               <Button variant="outline" className="w-full h-16 text-lg">
                 <Calendar className="mr-2 h-5 w-5" />
                 Nouveau Rendez-vous
+              </Button>
+            </Link>
+            <Link to="/billing">
+              <Button variant="outline" className="w-full h-16 text-lg">
+                <Receipt className="mr-2 h-5 w-5" />
+                Nouvelle Facture
               </Button>
             </Link>
           </div>
