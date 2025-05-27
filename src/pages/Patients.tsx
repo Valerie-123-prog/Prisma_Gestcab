@@ -8,19 +8,43 @@ import { Search, User, UserPlus } from 'lucide-react';
 import { usePatients } from '@/contexts/PatientContext';
 import { PatientForm } from '@/components/patients/PatientForm';
 import { PatientCard } from '@/components/patients/PatientCard';
+import { AdvancedFilters, FilterOptions } from '@/components/common/AdvancedFilters';
+import { ExportData } from '@/components/common/ExportData';
 import { useNavigate } from 'react-router-dom';
+import { isWithinInterval } from 'date-fns';
 
 const Patients = () => {
   const { patients, searchPatients } = usePatients();
   const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState<FilterOptions>({});
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const navigate = useNavigate();
-
-  const filteredPatients = searchPatients(searchQuery);
 
   const handlePatientClick = (patientId: string) => {
     navigate(`/patients/${patientId}`);
   };
+
+  // Apply search and filters
+  let filteredPatients = searchPatients(searchQuery);
+
+  // Apply date filters
+  if (filters.dateFrom || filters.dateTo) {
+    filteredPatients = filteredPatients.filter(patient => {
+      if (filters.dateFrom && patient.createdAt < filters.dateFrom) return false;
+      if (filters.dateTo && patient.createdAt > filters.dateTo) return false;
+      return true;
+    });
+  }
+
+  const filterTypes = [
+    { value: 'new', label: 'Nouveaux patients' },
+    { value: 'recurring', label: 'Patients récurrents' }
+  ];
+
+  const statusOptions = [
+    { value: 'active', label: 'Actif' },
+    { value: 'inactive', label: 'Inactif' }
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -32,32 +56,42 @@ const Patients = () => {
             <h1 className="text-3xl font-bold text-gray-900">Gestion des Patients</h1>
           </div>
           
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
-                <UserPlus className="h-4 w-4" />
-                Nouveau Patient
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Ajouter un Nouveau Patient</DialogTitle>
-              </DialogHeader>
-              <PatientForm onSuccess={() => setIsAddDialogOpen(false)} />
-            </DialogContent>
-          </Dialog>
+          <div className="flex gap-2">
+            <ExportData data={filteredPatients} filename="patients" type="patients" />
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="flex items-center gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Nouveau Patient
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Ajouter un Nouveau Patient</DialogTitle>
+                </DialogHeader>
+                <PatientForm onSuccess={() => setIsAddDialogOpen(false)} />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
-        {/* Barre de recherche */}
+        {/* Barre de recherche et filtres */}
         <Card>
           <CardContent className="pt-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Rechercher par nom, téléphone ou email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Rechercher par nom, téléphone ou email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <AdvancedFilters
+                onFiltersChange={setFilters}
+                filterTypes={filterTypes}
+                statusOptions={statusOptions}
               />
             </div>
           </CardContent>

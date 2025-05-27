@@ -4,13 +4,19 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Trash2 } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon, Plus, Trash2, Check, ChevronsUpDown } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+import { InvoiceFormData, InvoiceItem } from '@/types/billing';
 import { useBilling } from '@/contexts/BillingContext';
 import { usePatients } from '@/contexts/PatientContext';
-import { InvoiceFormData } from '@/types/billing';
 import { useToast } from '@/hooks/use-toast';
 
 interface InvoiceFormProps {
@@ -18,21 +24,17 @@ interface InvoiceFormProps {
 }
 
 export const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSuccess }) => {
-  const { addInvoice, settings } = useBilling();
+  const { addInvoice } = useBilling();
   const { patients } = usePatients();
   const { toast } = useToast();
   const [selectedPatient, setSelectedPatient] = useState<string>('');
+  const [patientSearchOpen, setPatientSearchOpen] = useState(false);
+  const [dueDate, setDueDate] = useState<Date>(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
 
-  const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm<InvoiceFormData>({
+  const { register, handleSubmit, control, formState: { errors }, setValue, watch } = useForm<InvoiceFormData>({
     defaultValues: {
       patientId: '',
-      items: [{
-        type: 'consultation',
-        description: 'Consultation médicale',
-        quantity: 1,
-        unitPrice: settings.defaultConsultationPrice
-      }],
-      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 jours
+      items: [{ type: 'consultation', description: 'Consultation générale', quantity: 1, unitPrice: 15000 }],
       notes: ''
     }
   });
@@ -44,8 +46,17 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSuccess }) => {
 
   const watchedItems = watch('items');
 
-  const calculateTotal = () => {
-    return watchedItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+  const calculateItemTotal = (index: number) => {
+    const item = watchedItems[index];
+    return (item?.quantity || 0) * (item?.unitPrice || 0);
+  };
+
+  const calculateSubtotal = () => {
+    return watchedItems.reduce((sum, item) => sum + ((item?.quantity || 0) * (item?.unitPrice || 0)), 0);
+  };
+
+  const addItem = () => {
+    append({ type: 'other', description: '', quantity: 1, unitPrice: 0 });
   };
 
   const onSubmit = (data: InvoiceFormData) => {
@@ -58,27 +69,25 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSuccess }) => {
       return;
     }
 
-    const patient = patients.find(p => p.id === selectedPatient);
-    if (!patient) {
-      toast({
-        title: "Erreur",
-        description: "Patient introuvable",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Transform the form data to match the expected type
+    const invoiceItems: InvoiceItem[] = data.items.map((item, index) => ({
+      id: crypto.randomUUID(),
+      type: item.type,
+      description: item.description,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      total: calculateItemTotal(index)
+    }));
 
-    addInvoice({
+    const invoiceData = {
+      ...data,
       patientId: selectedPatient,
-      patientName: `${patient.firstName} ${patient.lastName}`,
-      date: new Date(),
-      dueDate: data.dueDate,
-      items: data.items,
-      status: 'unpaid',
-      amountPaid: 0,
-      notes: data.notes,
-    });
+      items: invoiceItems,
+      dueDate: dueDate,
+    };
 
+    addInvoice(invoiceData);
+    
     toast({
       title: "Succès",
       description: "Facture créée avec succès",
@@ -87,163 +96,200 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSuccess }) => {
     onSuccess();
   };
 
-  const addItem = () => {
-    append({
-      type: 'other',
-      description: '',
-      quantity: 1,
-      unitPrice: 0
-    });
-  };
+  const selectedPatientData = patients.find(p => p.id === selectedPatient);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Sélection du patient */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Informations Patient</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <Label htmlFor="patient">Patient *</Label>
-            <Select value={selectedPatient} onValueChange={(value) => {
-              setSelectedPatient(value);
-              setValue('patientId', value);
-            }}>
-              <SelectTrigger>
-                <SelectValue placeholder="Sélectionner un patient" />
-              </SelectTrigger>
-              <SelectContent>
-                {patients.map((patient) => (
-                  <SelectItem key={patient.id} value={patient.id}>
-                    {patient.firstName} {patient.lastName} - {patient.phone}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Patient Selection */}
+      <div className="space-y-2">
+        <Label>Patient *</Label>
+        <Popover open={patientSearchOpen} onOpenChange={setPatientSearchOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={patientSearchOpen}
+              className="w-full justify-between"
+            >
+              {selectedPatientData
+                ? `${selectedPatientData.firstName} ${selectedPatientData.lastName}`
+                : "Sélectionner un patient..."}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0">
+            <Command>
+              <CommandInput placeholder="Rechercher un patient..." />
+              <CommandList>
+                <CommandEmpty>Aucun patient trouvé.</CommandEmpty>
+                <CommandGroup>
+                  {patients.map((patient) => (
+                    <CommandItem
+                      key={patient.id}
+                      value={`${patient.firstName} ${patient.lastName}`}
+                      onSelect={() => {
+                        setSelectedPatient(patient.id);
+                        setValue('patientId', patient.id);
+                        setPatientSearchOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          selectedPatient === patient.id ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {patient.firstName} {patient.lastName}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
 
-      {/* Articles de la facture */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Articles</CardTitle>
+      {/* Due Date */}
+      <div className="space-y-2">
+        <Label>Date d'échéance *</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-full justify-start text-left font-normal",
+                !dueDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {dueDate ? format(dueDate, "PPP", { locale: fr }) : "Sélectionner une date"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={dueDate}
+              onSelect={(date) => date && setDueDate(date)}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {/* Invoice Items */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <Label className="text-lg font-semibold">Articles</Label>
           <Button type="button" onClick={addItem} size="sm">
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 mr-1" />
             Ajouter
           </Button>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {fields.map((field, index) => (
-            <div key={field.id} className="grid grid-cols-1 md:grid-cols-6 gap-4 p-4 border rounded-lg">
-              <div>
-                <Label>Type</Label>
-                <Select 
-                  value={watchedItems[index]?.type} 
-                  onValueChange={(value) => setValue(`items.${index}.type`, value as any)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="consultation">Consultation</SelectItem>
-                    <SelectItem value="medication">Médicament</SelectItem>
-                    <SelectItem value="other">Autre</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        </div>
 
-              <div className="md:col-span-2">
-                <Label>Description</Label>
-                <Input
-                  {...register(`items.${index}.description`, { required: true })}
-                  placeholder="Description de l'article"
-                />
-              </div>
+        {fields.map((field, index) => (
+          <Card key={field.id}>
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                <div>
+                  <Label>Type</Label>
+                  <Select
+                    value={watchedItems[index]?.type || 'other'}
+                    onValueChange={(value) => setValue(`items.${index}.type`, value as any)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="consultation">Consultation</SelectItem>
+                      <SelectItem value="medication">Médicament</SelectItem>
+                      <SelectItem value="other">Autre</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div>
-                <Label>Quantité</Label>
-                <Input
-                  type="number"
-                  min="1"
-                  {...register(`items.${index}.quantity`, { 
-                    required: true, 
-                    min: 1,
-                    valueAsNumber: true 
-                  })}
-                />
-              </div>
+                <div className="md:col-span-2">
+                  <Label>Description</Label>
+                  <Input
+                    {...register(`items.${index}.description`, { required: 'Description requise' })}
+                    placeholder="Description de l'article"
+                  />
+                </div>
 
-              <div>
-                <Label>Prix unitaire (FCFA)</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  {...register(`items.${index}.unitPrice`, { 
-                    required: true, 
-                    min: 0,
-                    valueAsNumber: true 
-                  })}
-                />
-              </div>
+                <div>
+                  <Label>Quantité</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    {...register(`items.${index}.quantity`, { 
+                      required: 'Quantité requise',
+                      min: 1,
+                      valueAsNumber: true 
+                    })}
+                  />
+                </div>
 
-              <div className="flex items-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => remove(index)}
-                  disabled={fields.length === 1}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          ))}
+                <div>
+                  <Label>Prix unitaire (FCFA)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    {...register(`items.${index}.unitPrice`, { 
+                      required: 'Prix requis',
+                      min: 0,
+                      valueAsNumber: true 
+                    })}
+                  />
+                </div>
 
-          {/* Total */}
-          <div className="flex justify-end">
+                <div className="flex items-end">
+                  <div className="space-y-2 flex-1">
+                    <Label>Total</Label>
+                    <div className="text-lg font-semibold text-green-600">
+                      {calculateItemTotal(index).toLocaleString()} FCFA
+                    </div>
+                  </div>
+                  {fields.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => remove(index)}
+                      className="ml-2"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+
+        {/* Total */}
+        <Card>
+          <CardContent className="pt-6">
             <div className="text-right">
-              <p className="text-sm text-gray-600">Total</p>
-              <p className="text-2xl font-bold">{calculateTotal().toLocaleString()} FCFA</p>
+              <div className="text-xl font-bold text-green-600">
+                Total: {calculateSubtotal().toLocaleString()} FCFA
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Informations supplémentaires */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Informations Supplémentaires</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="dueDate">Date d'échéance</Label>
-            <Input
-              id="dueDate"
-              type="date"
-              {...register('dueDate', { 
-                required: true,
-                valueAsDate: true 
-              })}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              {...register('notes')}
-              placeholder="Notes supplémentaires..."
-              rows={3}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      {/* Notes */}
+      <div className="space-y-2">
+        <Label htmlFor="notes">Notes</Label>
+        <Textarea
+          id="notes"
+          {...register('notes')}
+          placeholder="Notes additionnelles..."
+          rows={3}
+        />
+      </div>
 
       {/* Actions */}
-      <div className="flex justify-end space-x-2">
+      <div className="flex justify-end space-x-2 pt-4">
         <Button type="button" variant="outline" onClick={onSuccess}>
           Annuler
         </Button>
