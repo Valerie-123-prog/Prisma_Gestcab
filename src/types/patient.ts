@@ -4,7 +4,7 @@ export interface Patient {
   firstName: string;
   lastName: string;
   dateOfBirth: Date;
-  gender: 'male' | 'female' | 'other';
+  gender: 'male' | 'female';
   phone: string;
   email?: string;
   address?: string;
@@ -15,6 +15,7 @@ export interface Patient {
   currentMedications?: string;
   consultations: Consultation[];
   medicalRecord?: MedicalRecord;
+  insuranceNumber?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,7 +30,7 @@ export interface PatientFormData {
   firstName: string;
   lastName: string;
   dateOfBirth: Date;
-  gender: 'male' | 'female' | 'other';
+  gender: 'male' | 'female';
   phone: string;
   email: string;
   address: string;
@@ -37,6 +38,7 @@ export interface PatientFormData {
   medicalHistory: string;
   allergies: string;
   currentMedications: string;
+  insuranceNumber: string;
 }
 
 export interface MedicalRecord {
@@ -45,6 +47,9 @@ export interface MedicalRecord {
   consultations: Consultation[];
   treatments: Treatment[];
   documents: Document[];
+  allergies: string[];
+  medicalHistory: string[];
+  currentTreatments: Treatment[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -69,6 +74,7 @@ export interface Treatment {
   startDate: Date;
   endDate?: Date;
   instructions: string;
+  notes?: string;
 }
 
 export interface Document {

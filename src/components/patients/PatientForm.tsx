@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon } from 'lucide-react';
@@ -24,13 +25,18 @@ const patientSchema = z.object({
   dateOfBirth: z.date({
     required_error: 'La date de naissance est requise',
   }),
-  gender: z.enum(['male', 'female', 'other']),
+  gender: z.enum(['male', 'female']),
   address: z.string().min(1, 'L\'adresse est requise'),
   phone: z.string().min(1, 'Le téléphone est requis'),
   email: z.string().email('Email invalide').optional().or(z.literal('')),
-  emergencyContactName: z.string().min(1, 'Le nom du contact d\'urgence est requis'),
-  emergencyContactPhone: z.string().min(1, 'Le téléphone du contact d\'urgence est requis'),
-  emergencyContactRelationship: z.string().min(1, 'La relation est requise'),
+  emergencyContact: z.object({
+    name: z.string().min(1, 'Le nom du contact d\'urgence est requis'),
+    phone: z.string().min(1, 'Le téléphone du contact d\'urgence est requis'),
+    relationship: z.string().min(1, 'La relation est requise'),
+  }),
+  medicalHistory: z.string().optional(),
+  allergies: z.string().optional(),
+  currentMedications: z.string().optional(),
   insuranceNumber: z.string().optional(),
 });
 
@@ -39,6 +45,16 @@ interface PatientFormProps {
   initialData?: Partial<PatientFormData>;
   patientId?: string;
 }
+
+const relationshipOptions = [
+  { value: 'spouse', label: 'Époux/Épouse' },
+  { value: 'parent', label: 'Parent' },
+  { value: 'child', label: 'Enfant' },
+  { value: 'sibling', label: 'Frère/Sœur' },
+  { value: 'friend', label: 'Ami(e)' },
+  { value: 'colleague', label: 'Collègue' },
+  { value: 'other', label: 'Autre' },
+];
 
 export const PatientForm: React.FC<PatientFormProps> = ({ 
   onSuccess, 
@@ -58,9 +74,14 @@ export const PatientForm: React.FC<PatientFormProps> = ({
       address: initialData?.address || '',
       phone: initialData?.phone || '',
       email: initialData?.email || '',
-      emergencyContactName: initialData?.emergencyContactName || '',
-      emergencyContactPhone: initialData?.emergencyContactPhone || '',
-      emergencyContactRelationship: initialData?.emergencyContactRelationship || '',
+      emergencyContact: {
+        name: initialData?.emergencyContact?.name || '',
+        phone: initialData?.emergencyContact?.phone || '',
+        relationship: initialData?.emergencyContact?.relationship || '',
+      },
+      medicalHistory: initialData?.medicalHistory || '',
+      allergies: initialData?.allergies || '',
+      currentMedications: initialData?.currentMedications || '',
       insuranceNumber: initialData?.insuranceNumber || '',
     },
   });
@@ -77,11 +98,10 @@ export const PatientForm: React.FC<PatientFormProps> = ({
           address: data.address,
           phone: data.phone,
           email: data.email || undefined,
-          emergencyContact: {
-            name: data.emergencyContactName,
-            phone: data.emergencyContactPhone,
-            relationship: data.emergencyContactRelationship,
-          },
+          emergencyContact: data.emergencyContact,
+          medicalHistory: data.medicalHistory,
+          allergies: data.allergies,
+          currentMedications: data.currentMedications,
           insuranceNumber: data.insuranceNumber || undefined,
         });
         
@@ -99,15 +119,14 @@ export const PatientForm: React.FC<PatientFormProps> = ({
           address: data.address,
           phone: data.phone,
           email: data.email || undefined,
-          emergencyContact: {
-            name: data.emergencyContactName,
-            phone: data.emergencyContactPhone,
-            relationship: data.emergencyContactRelationship,
-          },
+          emergencyContact: data.emergencyContact,
+          medicalHistory: data.medicalHistory,
+          allergies: data.allergies,
+          currentMedications: data.currentMedications,
           insuranceNumber: data.insuranceNumber || undefined,
           medicalRecord: {
-            allergies: [],
-            medicalHistory: [],
+            allergies: data.allergies ? [data.allergies] : [],
+            medicalHistory: data.medicalHistory ? [data.medicalHistory] : [],
             currentTreatments: [],
           },
           consultations: [],
@@ -209,7 +228,7 @@ export const PatientForm: React.FC<PatientFormProps> = ({
             <Label>Sexe *</Label>
             <RadioGroup 
               value={form.watch('gender')} 
-              onValueChange={(value) => form.setValue('gender', value as 'male' | 'female' | 'other')}
+              onValueChange={(value) => form.setValue('gender', value as 'male' | 'female')}
               className="flex flex-row gap-6 mt-2"
             >
               <div className="flex items-center space-x-2">
@@ -219,10 +238,6 @@ export const PatientForm: React.FC<PatientFormProps> = ({
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="female" id="female" />
                 <Label htmlFor="female">Femme</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="other" id="other" />
-                <Label htmlFor="other">Autre</Label>
               </div>
             </RadioGroup>
           </div>
@@ -284,12 +299,12 @@ export const PatientForm: React.FC<PatientFormProps> = ({
             <Label htmlFor="emergencyContactName">Nom du contact *</Label>
             <Input
               id="emergencyContactName"
-              {...form.register('emergencyContactName')}
+              {...form.register('emergencyContact.name')}
               className="mt-1"
             />
-            {form.formState.errors.emergencyContactName && (
+            {form.formState.errors.emergencyContact?.name && (
               <p className="text-sm text-red-600 mt-1">
-                {form.formState.errors.emergencyContactName.message}
+                {form.formState.errors.emergencyContact.name.message}
               </p>
             )}
           </div>
@@ -298,12 +313,12 @@ export const PatientForm: React.FC<PatientFormProps> = ({
             <Label htmlFor="emergencyContactPhone">Téléphone du contact *</Label>
             <Input
               id="emergencyContactPhone"
-              {...form.register('emergencyContactPhone')}
+              {...form.register('emergencyContact.phone')}
               className="mt-1"
             />
-            {form.formState.errors.emergencyContactPhone && (
+            {form.formState.errors.emergencyContact?.phone && (
               <p className="text-sm text-red-600 mt-1">
-                {form.formState.errors.emergencyContactPhone.message}
+                {form.formState.errors.emergencyContact.phone.message}
               </p>
             )}
           </div>
@@ -311,23 +326,65 @@ export const PatientForm: React.FC<PatientFormProps> = ({
 
         <div>
           <Label htmlFor="emergencyContactRelationship">Relation *</Label>
-          <Input
-            id="emergencyContactRelationship"
-            {...form.register('emergencyContactRelationship')}
-            placeholder="Ex: Époux/se, Enfant, Parent, Ami..."
-            className="mt-1"
-          />
-          {form.formState.errors.emergencyContactRelationship && (
+          <Select
+            value={form.watch('emergencyContact.relationship')}
+            onValueChange={(value) => form.setValue('emergencyContact.relationship', value)}
+          >
+            <SelectTrigger className="mt-1">
+              <SelectValue placeholder="Sélectionner une relation" />
+            </SelectTrigger>
+            <SelectContent>
+              {relationshipOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {form.formState.errors.emergencyContact?.relationship && (
             <p className="text-sm text-red-600 mt-1">
-              {form.formState.errors.emergencyContactRelationship.message}
+              {form.formState.errors.emergencyContact.relationship.message}
             </p>
           )}
         </div>
       </div>
 
-      {/* Informations complémentaires */}
+      {/* Historique médical */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">Informations complémentaires</h3>
+        <h3 className="text-lg font-semibold text-gray-900">Historique médical</h3>
+        
+        <div>
+          <Label htmlFor="medicalHistory">Antécédents médicaux</Label>
+          <Textarea
+            id="medicalHistory"
+            {...form.register('medicalHistory')}
+            className="mt-1"
+            rows={3}
+            placeholder="Antécédents médicaux du patient..."
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="allergies">Allergies</Label>
+          <Textarea
+            id="allergies"
+            {...form.register('allergies')}
+            className="mt-1"
+            rows={2}
+            placeholder="Allergies connues..."
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="currentMedications">Médicaments actuels</Label>
+          <Textarea
+            id="currentMedications"
+            {...form.register('currentMedications')}
+            className="mt-1"
+            rows={2}
+            placeholder="Médicaments en cours..."
+          />
+        </div>
         
         <div>
           <Label htmlFor="insuranceNumber">Numéro d'assurance</Label>
