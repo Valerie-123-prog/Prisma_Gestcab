@@ -29,7 +29,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSuccess }) => {
   const { toast } = useToast();
   const [selectedPatient, setSelectedPatient] = useState<string>('');
   const [patientSearchOpen, setPatientSearchOpen] = useState(false);
-  const [dueDate, setDueDate] = useState<Date>(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
+  const [dueDate, setDueDate] = useState<Date>(new Date()); // Date d'échéance par défaut = aujourd'hui
 
   const { register, handleSubmit, control, formState: { errors }, setValue, watch } = useForm<InvoiceFormData>({
     defaultValues: {
@@ -83,6 +83,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSuccess }) => {
       ...data,
       patientId: selectedPatient,
       items: invoiceItems,
+      date: new Date(), // Ajouter la date requise
       dueDate: dueDate,
     };
 
