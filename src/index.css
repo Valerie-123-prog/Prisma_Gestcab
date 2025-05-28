@@ -97,54 +97,86 @@
     line-height: 1.6;
   }
 
-  /* Amélioration de la lisibilité */
+  /* Configuration pour le Cameroun */
+  html {
+    lang: fr-CM;
+  }
+
+  /* Amélioration de la lisibilité pour le français */
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold;
     line-height: 1.4;
+    letter-spacing: -0.025em;
   }
 
-  /* Zoom automatique sur les champs de saisie pour mobile */
+  /* Zoom automatique sur les champs de saisie pour mobile (Cameroun) */
   @media screen and (max-width: 768px) {
     input, textarea, select {
       font-size: 16px !important;
       transform-origin: top left;
     }
+    
+    /* Format de téléphone pour le Cameroun */
+    input[type="tel"] {
+      font-family: monospace;
+    }
   }
 
-  /* Support orientation paysage */
+  /* Support orientation paysage optimisé pour appareils locaux */
   @media screen and (orientation: landscape) and (max-height: 600px) {
     .mobile-landscape-compact {
       @apply py-2;
     }
+    
+    .navigation-mobile {
+      @apply h-12;
+    }
   }
 
-  /* Boutons tactiles optimisés */
+  /* Boutons tactiles optimisés pour la chaleur tropicale */
   .touch-target {
-    min-height: 44px;
-    min-width: 44px;
+    min-height: 48px;
+    min-width: 48px;
     @apply p-3;
   }
 
-  /* Espacement pour les éléments tactiles */
+  /* Espacement pour les éléments tactiles (climat chaud) */
   .touch-spacing {
-    @apply space-y-4 md:space-y-2;
+    @apply space-y-5 md:space-y-3;
   }
 
-  /* Amélioration des contrastes */
+  /* Amélioration des contrastes pour conditions de luminosité variables */
   .medical-card {
-    @apply bg-white border border-blue-100 shadow-sm hover:shadow-md transition-shadow;
+    @apply bg-white border border-blue-200 shadow-md hover:shadow-lg transition-shadow;
+    border-width: 2px;
   }
 
   .medical-button {
     @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors touch-target;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
   }
 
   .medical-input {
-    @apply border-blue-200 focus:border-blue-500 focus:ring-blue-500 text-base p-3 rounded-lg;
+    @apply border-blue-300 focus:border-blue-600 focus:ring-blue-600 text-base p-3 rounded-lg;
+    border-width: 2px;
+  }
+
+  /* Styles spécifiques pour les devises FCFA */
+  .currency-display {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-weight: 600;
+    color: #059669;
+  }
+
+  /* Styles pour les numéros de téléphone camerounais */
+  .phone-display {
+    font-family: monospace;
+    font-size: 0.95em;
+    letter-spacing: 0.5px;
   }
 }
 
-/* Classes utilitaires personnalisées */
+/* Classes utilitaires pour le Cameroun */
 @layer utilities {
   .text-medical-primary {
     @apply text-blue-600;
@@ -163,6 +195,31 @@
   }
   
   .border-medical {
-    @apply border-blue-200;
+    @apply border-blue-300;
   }
+
+  .text-currency {
+    @apply text-green-600 font-semibold;
+  }
+
+  .text-phone {
+    @apply font-mono text-sm tracking-wide;
+  }
+
+  /* Utilitaires pour dates françaises */
+  .date-fr {
+    direction: ltr;
+    text-align: left;
+  }
+}
+
+/* Animation spéciale pour les paiements mobiles (Orange/MTN) */
+@keyframes mobile-money {
+  0% { background-color: #f3f4f6; }
+  50% { background-color: #fef3c7; }
+  100% { background-color: #f3f4f6; }
+}
+
+.payment-mobile-money {
+  animation: mobile-money 2s ease-in-out;
 }

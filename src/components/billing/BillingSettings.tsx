@@ -53,6 +53,7 @@ export const BillingSettings: React.FC<BillingSettingsProps> = ({ onSuccess }) =
           <Input
             id="clinicAddress"
             {...register('clinicAddress', { required: 'L\'adresse est requise' })}
+            placeholder="Ville, Région, Cameroun"
           />
           {errors.clinicAddress && (
             <p className="text-sm text-red-600 mt-1">{errors.clinicAddress.message}</p>
@@ -63,7 +64,14 @@ export const BillingSettings: React.FC<BillingSettingsProps> = ({ onSuccess }) =
           <Label htmlFor="clinicPhone">Téléphone *</Label>
           <Input
             id="clinicPhone"
-            {...register('clinicPhone', { required: 'Le téléphone est requis' })}
+            {...register('clinicPhone', { 
+              required: 'Le téléphone est requis',
+              pattern: {
+                value: /^\+237[67]\d{8}$/,
+                message: 'Format: +237 6XX XXX XXX'
+              }
+            })}
+            placeholder="+237 6XX XXX XXX"
           />
           {errors.clinicPhone && (
             <p className="text-sm text-red-600 mt-1">{errors.clinicPhone.message}</p>
@@ -76,6 +84,7 @@ export const BillingSettings: React.FC<BillingSettingsProps> = ({ onSuccess }) =
             id="clinicEmail"
             type="email"
             {...register('clinicEmail')}
+            placeholder="contact@centre.cm"
           />
         </div>
       </div>

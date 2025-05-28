@@ -70,7 +70,8 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ invoice, onSuccess }) 
   const getPaymentMethodLabel = (method: PaymentMethod) => {
     switch (method) {
       case 'cash': return 'Espèces';
-      case 'mobile_money': return 'Mobile Money';
+      case 'orange_money': return 'Orange Money';
+      case 'mtn_mobile_money': return 'MTN Mobile Money';
       case 'check': return 'Chèque';
       case 'transfer': return 'Virement';
       default: return method;
@@ -126,7 +127,8 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ invoice, onSuccess }) 
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="cash">Espèces</SelectItem>
-            <SelectItem value="mobile_money">Mobile Money</SelectItem>
+            <SelectItem value="orange_money">Orange Money</SelectItem>
+            <SelectItem value="mtn_mobile_money">MTN Mobile Money</SelectItem>
             <SelectItem value="check">Chèque</SelectItem>
             <SelectItem value="transfer">Virement</SelectItem>
           </SelectContent>

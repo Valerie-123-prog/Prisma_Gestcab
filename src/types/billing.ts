@@ -35,7 +35,7 @@ export interface Payment {
   notes?: string;
 }
 
-export type PaymentMethod = 'cash' | 'mobile_money' | 'check' | 'transfer';
+export type PaymentMethod = 'cash' | 'orange_money' | 'mtn_mobile_money' | 'check' | 'transfer';
 
 export interface BillingSettings {
   clinicName: string;

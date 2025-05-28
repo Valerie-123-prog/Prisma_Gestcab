@@ -5,26 +5,37 @@ export interface Patient {
   lastName: string;
   dateOfBirth: Date;
   gender: 'male' | 'female' | 'other';
-  address: string;
   phone: string;
   email?: string;
-  emergencyContact: {
-    name: string;
-    phone: string;
-    relationship: string;
-  };
-  insuranceNumber?: string;
-  photo?: string;
-  medicalRecord: MedicalRecord;
-  consultations: Consultation[];
+  address?: string;
+  emergencyContact?: string;
+  emergencyPhone?: string;
+  medicalHistory?: string;
+  allergies?: string;
+  currentMedications?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface MedicalRecord {
-  allergies: string[];
-  medicalHistory: string[];
-  currentTreatments: Treatment[];
+  id: string;
+  patientId: string;
+  consultations: Consultation[];
+  treatments: Treatment[];
+  documents: Document[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Consultation {
+  id: string;
+  date: Date;
+  reason: string;
+  symptoms: string;
+  diagnosis: string;
+  prescription: string;
+  notes: string;
+  doctorName: string;
 }
 
 export interface Treatment {
@@ -32,30 +43,16 @@ export interface Treatment {
   medication: string;
   dosage: string;
   frequency: string;
+  duration: string;
   startDate: Date;
   endDate?: Date;
-  notes?: string;
+  instructions: string;
 }
 
-export interface Consultation {
+export interface Document {
   id: string;
-  date: Date;
-  diagnosis: string;
-  prescription: string;
-  notes?: string;
-  doctorName: string;
-}
-
-export interface PatientFormData {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: Date | undefined;
-  gender: 'male' | 'female' | 'other';
-  address: string;
-  phone: string;
-  email: string;
-  emergencyContactName: string;
-  emergencyContactPhone: string;
-  emergencyContactRelationship: string;
-  insuranceNumber: string;
+  name: string;
+  type: string;
+  url: string;
+  uploadedAt: Date;
 }

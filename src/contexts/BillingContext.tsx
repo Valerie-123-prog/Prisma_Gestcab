@@ -1,12 +1,12 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Invoice, Payment, BillingSettings, InvoiceItem } from '@/types/billing';
+import { usePatients } from './PatientContext';
 
 interface BillingContextType {
   invoices: Invoice[];
   payments: Payment[];
   settings: BillingSettings;
-  addInvoice: (invoice: Omit<Invoice, 'id' | 'invoiceNumber' | 'subtotal' | 'total' | 'createdAt' | 'updatedAt'>) => void;
+  addInvoice: (invoice: Omit<Invoice, 'id' | 'invoiceNumber' | 'subtotal' | 'total' | 'createdAt' | 'updatedAt' | 'status' | 'amountPaid' | 'patientName'>) => void;
   updateInvoice: (id: string, updates: Partial<Invoice>) => void;
   deleteInvoice: (id: string) => void;
   getInvoice: (id: string) => Invoice | undefined;
@@ -31,9 +31,9 @@ export const useBilling = () => {
 
 const defaultSettings: BillingSettings = {
   clinicName: 'Centre Médical',
-  clinicAddress: 'Adresse du centre médical',
-  clinicPhone: '+221 XX XXX XXXX',
-  clinicEmail: 'contact@centremedical.sn',
+  clinicAddress: 'Adresse du centre médical, Yaoundé, Cameroun',
+  clinicPhone: '+237 6XX XXX XXX',
+  clinicEmail: 'contact@centremedical.cm',
   defaultConsultationPrice: 15000,
   invoicePrefix: 'FAC',
   nextInvoiceNumber: 1,
@@ -43,6 +43,7 @@ export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [settings, setSettings] = useState<BillingSettings>(defaultSettings);
+  const { patients } = usePatients();
 
   // Charger les données depuis localStorage au démarrage
   useEffect(() => {
@@ -97,7 +98,10 @@ export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return number;
   };
 
-  const addInvoice = (invoiceData: Omit<Invoice, 'id' | 'invoiceNumber' | 'subtotal' | 'total' | 'createdAt' | 'updatedAt'>) => {
+  const addInvoice = (invoiceData: Omit<Invoice, 'id' | 'invoiceNumber' | 'subtotal' | 'total' | 'createdAt' | 'updatedAt' | 'status' | 'amountPaid' | 'patientName'>) => {
+    const patient = patients.find(p => p.id === invoiceData.patientId);
+    const patientName = patient ? `${patient.firstName} ${patient.lastName}` : 'Patient inconnu';
+    
     const itemsWithIds = invoiceData.items.map(item => ({
       ...item,
       id: crypto.randomUUID(),
@@ -110,9 +114,13 @@ export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ...invoiceData,
       id: crypto.randomUUID(),
       invoiceNumber: generateInvoiceNumber(),
+      patientName,
+      date: new Date(),
       items: itemsWithIds,
       subtotal: total,
       total,
+      status: 'unpaid',
+      amountPaid: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
