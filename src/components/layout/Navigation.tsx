@@ -92,7 +92,7 @@ export const Navigation = () => {
       {/* Navigation Desktop */}
       <div className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 lg:bg-white lg:border-r lg:border-blue-100">
         <div className="flex items-center justify-center h-16 bg-blue-600 text-white">
-          <h1 className="text-xl font-bold">MedicalApp</h1>
+          <h1 className="text-xl font-bold">Prisma GestCab</h1>
         </div>
         <div className="flex-1 p-4 overflow-y-auto">
           <NavigationList />
@@ -105,7 +105,7 @@ export const Navigation = () => {
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <div className="w-4 h-4 bg-white rounded-sm"></div>
           </div>
-          <span className="font-bold text-blue-600">MedicalApp</span>
+          <span className="font-bold text-blue-600">Prisma GestCab</span>
         </Link>
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
