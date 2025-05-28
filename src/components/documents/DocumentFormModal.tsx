@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Document } from '@/types/document';
+import { usePatients } from '@/contexts/PatientContext';
 
 interface DocumentFormModalProps {
   open: boolean;
@@ -19,6 +20,7 @@ export const DocumentFormModal: React.FC<DocumentFormModalProps> = ({
   onOpenChange,
   onSubmit
 }) => {
+  const { patients } = usePatients();
   const [formData, setFormData] = useState({
     name: '',
     type: 'medical' as Document['type'],
@@ -94,13 +96,18 @@ export const DocumentFormModal: React.FC<DocumentFormModalProps> = ({
 
           <div className="space-y-2">
             <Label htmlFor="patientName">Nom du patient</Label>
-            <Input
-              id="patientName"
-              value={formData.patientName}
-              onChange={(e) => handleInputChange('patientName', e.target.value)}
-              placeholder="Ex: Jean Dupont"
-              required
-            />
+            <Select value={formData.patientName} onValueChange={(value) => handleInputChange('patientName', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner un patient" />
+              </SelectTrigger>
+              <SelectContent>
+                {patients.map((patient) => (
+                  <SelectItem key={patient.id} value={`${patient.firstName} ${patient.lastName}`}>
+                    {patient.firstName} {patient.lastName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
