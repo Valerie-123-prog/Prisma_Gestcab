@@ -189,6 +189,6 @@ export const TreatmentForm: React.FC<TreatmentFormProps> = ({ patientId, onSucce
           Ajouter le Traitement
         </Button>
       </div>
-    </div>
+    </form>
   );
 };
