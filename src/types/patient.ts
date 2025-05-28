@@ -8,13 +8,35 @@ export interface Patient {
   phone: string;
   email?: string;
   address?: string;
-  emergencyContact?: string;
-  emergencyPhone?: string;
+  photo?: string;
+  emergencyContact?: EmergencyContact;
   medicalHistory?: string;
   allergies?: string;
   currentMedications?: string;
+  consultations: Consultation[];
+  medicalRecord?: MedicalRecord;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface EmergencyContact {
+  name: string;
+  phone: string;
+  relationship: string;
+}
+
+export interface PatientFormData {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: Date;
+  gender: 'male' | 'female' | 'other';
+  phone: string;
+  email: string;
+  address: string;
+  emergencyContact: EmergencyContact;
+  medicalHistory: string;
+  allergies: string;
+  currentMedications: string;
 }
 
 export interface MedicalRecord {

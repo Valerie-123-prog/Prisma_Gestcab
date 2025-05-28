@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { format, startOfWeek, addDays, isSameDay, addWeeks, subWeeks, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { startOfWeek, addDays, isSameDay, addWeeks, subWeeks, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { formatDateFr, formatDateLongFr, formatDateShortFr, dayNamesShortFr } from '@/lib/dateUtils';
 import { useAppointments } from '@/contexts/AppointmentContext';
 import { Appointment } from '@/types/appointment';
 
@@ -133,7 +133,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             <Card key={day.toISOString()} className={isToday ? 'ring-2 ring-primary' : ''}>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-center">
-                  {format(day, 'EEE dd', { locale: fr })}
+                  {formatDateShortFr(day)}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-1">
@@ -176,7 +176,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
     return (
       <div className="grid grid-cols-7 gap-1">
-        {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(day => (
+        {dayNamesShortFr.slice(1).concat(dayNamesShortFr.slice(0, 1)).map(day => (
           <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
             {day}
           </div>
@@ -193,7 +193,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             >
               <CardContent className="p-1">
                 <div className="text-sm font-medium mb-1">
-                  {format(day, 'd')}
+                  {day.getDate()}
                 </div>
                 <div className="space-y-1">
                   {dayAppointments.slice(0, 2).map(appointment => (
@@ -223,13 +223,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   const getTitle = () => {
     switch (viewType) {
       case 'day':
-        return format(currentDate, 'EEEE dd MMMM yyyy', { locale: fr });
+        return formatDateLongFr(currentDate);
       case 'week':
         const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
         const weekEnd = addDays(weekStart, 6);
-        return `${format(weekStart, 'dd MMM', { locale: fr })} - ${format(weekEnd, 'dd MMM yyyy', { locale: fr })}`;
+        return `${formatDateShortFr(weekStart)} - ${formatDateShortFr(weekEnd)}`;
       case 'month':
-        return format(currentDate, 'MMMM yyyy', { locale: fr });
+        return formatDateFr(currentDate, 'MMMM yyyy');
     }
   };
 

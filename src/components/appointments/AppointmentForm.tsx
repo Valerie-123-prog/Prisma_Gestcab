@@ -1,10 +1,7 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { CalendarIcon, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -14,6 +11,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { formatDateFr } from '@/lib/dateUtils';
 import { useAppointments } from '@/contexts/AppointmentContext';
 import { usePatients } from '@/contexts/PatientContext';
 import { toast } from '@/hooks/use-toast';
@@ -97,7 +95,7 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSuccess, sel
 
     toast({
       title: 'Rendez-vous créé',
-      description: `Le rendez-vous a été programmé pour le ${format(data.date, 'dd/MM/yyyy', { locale: fr })} à ${data.startTime}`,
+      description: `Le rendez-vous a été programmé pour le ${formatDateFr(data.date)} à ${data.startTime}`,
     });
 
     form.reset();
@@ -180,7 +178,7 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSuccess, sel
                       )}
                     >
                       {field.value ? (
-                        format(field.value, "dd/MM/yyyy", { locale: fr })
+                        formatDateFr(field.value)
                       ) : (
                         <span>Sélectionner une date</span>
                       )}
@@ -195,7 +193,6 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSuccess, sel
                     onSelect={field.onChange}
                     disabled={(date) => date < new Date()}
                     initialFocus
-                    className="pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>

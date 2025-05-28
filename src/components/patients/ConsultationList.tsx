@@ -4,15 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, User } from 'lucide-react';
 import { Patient } from '@/types/patient';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { formatDateFr, formatTimeFr } from '@/lib/dateUtils';
 
 interface ConsultationListProps {
   patient: Patient;
 }
 
 export const ConsultationList: React.FC<ConsultationListProps> = ({ patient }) => {
-  const sortedConsultations = [...patient.consultations].sort((a, b) => 
+  const sortedConsultations = [...(patient.consultations || [])].sort((a, b) => 
     b.date.getTime() - a.date.getTime()
   );
 
@@ -42,7 +41,7 @@ export const ConsultationList: React.FC<ConsultationListProps> = ({ patient }) =
             <div className="flex items-start justify-between">
               <div>
                 <CardTitle className="text-lg">
-                  {format(consultation.date, 'dd MMMM yyyy', { locale: fr })}
+                  {formatDateFr(consultation.date, 'dd MMMM yyyy')}
                 </CardTitle>
                 <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
                   <User className="h-4 w-4" />
@@ -50,7 +49,7 @@ export const ConsultationList: React.FC<ConsultationListProps> = ({ patient }) =
                 </div>
               </div>
               <Badge variant="outline">
-                {format(consultation.date, 'HH:mm', { locale: fr })}
+                {formatTimeFr(consultation.date)}
               </Badge>
             </div>
           </CardHeader>

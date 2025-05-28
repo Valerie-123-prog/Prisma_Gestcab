@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AppointmentForm } from '@/components/appointments/AppointmentForm';
 import { CalendarView } from '@/components/appointments/CalendarView';
+import { formatDateFr } from '@/lib/dateUtils';
 import { useAppointments } from '@/contexts/AppointmentContext';
 import { Appointment } from '@/types/appointment';
 
