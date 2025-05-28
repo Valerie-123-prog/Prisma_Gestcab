@@ -19,7 +19,8 @@ import {
   FilePlus,
   Microscope,
   TestTube,
-  Activity
+  Activity,
+  Plus
 } from 'lucide-react';
 
 interface Document {
@@ -149,16 +150,20 @@ const Documents = () => {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button className="medical-button">
-              <Upload className="h-4 w-4 mr-2" />
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md">
+              <Plus className="h-4 w-4 mr-2" />
               Nouveau Document
+            </Button>
+            <Button variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50">
+              <Upload className="h-4 w-4 mr-2" />
+              Importer
             </Button>
           </div>
         </div>
 
         {/* Statistiques du laboratoire */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="medical-card">
+          <Card className="bg-white shadow-md hover:shadow-lg transition-shadow border-l-4 border-l-indigo-500">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
                 <Microscope className="h-5 w-5 text-indigo-600" />
@@ -171,7 +176,7 @@ const Documents = () => {
             </CardContent>
           </Card>
 
-          <Card className="medical-card">
+          <Card className="bg-white shadow-md hover:shadow-lg transition-shadow border-l-4 border-l-red-500">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
                 <Activity className="h-5 w-5 text-red-600" />
@@ -184,7 +189,7 @@ const Documents = () => {
             </CardContent>
           </Card>
 
-          <Card className="medical-card">
+          <Card className="bg-white shadow-md hover:shadow-lg transition-shadow border-l-4 border-l-green-500">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-green-600" />
@@ -199,7 +204,7 @@ const Documents = () => {
         </div>
 
         {/* Filtres et recherche */}
-        <Card className="medical-card mb-6">
+        <Card className="bg-white shadow-md mb-6">
           <CardHeader>
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div className="flex-1">
@@ -213,7 +218,7 @@ const Documents = () => {
                   />
                 </div>
               </div>
-              <Button variant="outline" className="shrink-0">
+              <Button variant="outline" className="shrink-0 border-blue-200 text-blue-600 hover:bg-blue-50">
                 <Filter className="h-4 w-4 mr-2" />
                 Filtres avancés
               </Button>
@@ -222,7 +227,7 @@ const Documents = () => {
         </Card>
 
         {/* Liste des documents avec onglets */}
-        <Card className="medical-card">
+        <Card className="bg-white shadow-md">
           <CardHeader>
             <CardTitle>Documents et Résultats</CardTitle>
             <CardDescription>
