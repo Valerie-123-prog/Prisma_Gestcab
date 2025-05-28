@@ -26,12 +26,19 @@ const Index = () => {
             Logiciel de gestion de cabinet médical
           </p>
           
-          {/* Bouton Commencer */}
-          <Link to="/patients" className="block">
-            <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-8 text-lg font-medium rounded-lg">
-              Commencer
-            </Button>
-          </Link>
+          {/* Boutons */}
+          <div className="space-y-4">
+            <Link to="/patients" className="block">
+              <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-8 text-lg font-medium rounded-lg">
+                Commencer
+              </Button>
+            </Link>
+            <Link to="/login" className="block">
+              <Button variant="outline" className="w-full py-3 px-8 text-lg font-medium rounded-lg">
+                Se connecter
+              </Button>
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>
