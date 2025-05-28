@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +10,8 @@ import {
   FileText,
   FileImage,
   FilePlus,
-  TestTube
+  TestTube,
+  Folder
 } from 'lucide-react';
 import { Document } from '@/types/document';
 
@@ -26,6 +26,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({ document }) => {
       case 'image': return <FileImage className="h-4 w-4" />;
       case 'medical': return <FileText className="h-4 w-4" />;
       case 'prescription': return <FilePlus className="h-4 w-4" />;
+      case 'administratifs': return <Folder className="h-4 w-4" />;
       default: return <FileText className="h-4 w-4" />;
     }
   };

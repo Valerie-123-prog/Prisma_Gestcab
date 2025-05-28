@@ -75,6 +75,7 @@ export const DocumentFormModal: React.FC<DocumentFormModalProps> = ({
                 <SelectItem value="lab">Laboratoire</SelectItem>
                 <SelectItem value="image">Imagerie</SelectItem>
                 <SelectItem value="prescription">Ordonnance</SelectItem>
+                <SelectItem value="administratifs">Administratifs</SelectItem>
                 <SelectItem value="report">Rapport</SelectItem>
               </SelectContent>
             </Select>

@@ -2,7 +2,7 @@
 export interface Document {
   id: string;
   name: string;
-  type: 'medical' | 'lab' | 'image' | 'prescription' | 'report';
+  type: 'medical' | 'lab' | 'image' | 'prescription' | 'administratifs' | 'report';
   category: string;
   patientName: string;
   date: Date;

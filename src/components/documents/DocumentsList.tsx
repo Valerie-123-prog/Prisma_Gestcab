@@ -35,7 +35,7 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({
       </CardHeader>
       <CardContent>
         <Tabs value={selectedTab} onValueChange={onTabChange}>
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 text-xs sm:text-sm">
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 text-xs sm:text-sm">
             <TabsTrigger value="all">Tous</TabsTrigger>
             <TabsTrigger value="lab" className="hidden sm:block">Laboratoire</TabsTrigger>
             <TabsTrigger value="lab" className="sm:hidden">Lab</TabsTrigger>
@@ -44,6 +44,8 @@ export const DocumentsList: React.FC<DocumentsListProps> = ({
             <TabsTrigger value="medical" className="sm:hidden">Méd</TabsTrigger>
             <TabsTrigger value="prescription" className="hidden sm:block">Ordonnances</TabsTrigger>
             <TabsTrigger value="prescription" className="sm:hidden">Ord</TabsTrigger>
+            <TabsTrigger value="administratifs" className="hidden sm:block">Administratifs</TabsTrigger>
+            <TabsTrigger value="administratifs" className="sm:hidden">Admin</TabsTrigger>
           </TabsList>
 
           <TabsContent value={selectedTab} className="mt-4 sm:mt-6">
