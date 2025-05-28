@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -12,7 +13,7 @@ export default {
 	theme: {
 		container: {
 			center: true,
-			padding: '2rem',
+			padding: '1rem',
 			screens: {
 				'2xl': '1400px'
 			}
@@ -61,6 +62,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				medical: {
+					primary: '#2563eb',
+					secondary: '#3b82f6',
+					light: '#eff6ff',
+					50: '#eff6ff',
+					100: '#dbeafe',
+					600: '#2563eb',
+					700: '#1d4ed8'
 				}
 			},
 			borderRadius: {
@@ -89,6 +99,15 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
+			},
+			screens: {
+				'xs': '475px',
+			},
+			spacing: {
+				'touch': '44px',
+			},
+			fontSize: {
+				'touch': ['16px', '1.5'],
 			}
 		}
 	},

@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { PatientProvider } from "@/contexts/PatientContext";
 import { AppointmentProvider } from "@/contexts/AppointmentContext";
 import { BillingProvider } from "@/contexts/BillingContext";
+import { Layout } from "@/components/layout/Layout";
 import Index from "./pages/Index";
 import Patients from "./pages/Patients";
 import PatientDetail from "./pages/PatientDetail";
@@ -26,16 +27,18 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/patients" element={<Patients />} />
-                <Route path="/patients/:id" element={<PatientDetail />} />
-                <Route path="/appointments" element={<Appointments />} />
-                <Route path="/billing" element={<Billing />} />
-                <Route path="/reports" element={<Reports />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/patients" element={<Patients />} />
+                  <Route path="/patients/:id" element={<PatientDetail />} />
+                  <Route path="/appointments" element={<Appointments />} />
+                  <Route path="/billing" element={<Billing />} />
+                  <Route path="/reports" element={<Reports />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Layout>
             </BrowserRouter>
           </BillingProvider>
         </AppointmentProvider>
