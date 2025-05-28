@@ -13,6 +13,7 @@ import Patients from "./pages/Patients";
 import PatientDetail from "./pages/PatientDetail";
 import Appointments from "./pages/Appointments";
 import Billing from "./pages/Billing";
+import Documents from "./pages/Documents";
 import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 
@@ -34,6 +35,7 @@ const App = () => (
                   <Route path="/patients/:id" element={<PatientDetail />} />
                   <Route path="/appointments" element={<Appointments />} />
                   <Route path="/billing" element={<Billing />} />
+                  <Route path="/documents" element={<Documents />} />
                   <Route path="/reports" element={<Reports />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

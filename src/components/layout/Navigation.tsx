@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Users, Calendar, Receipt, BarChart3, Home, Menu, X } from 'lucide-react';
+import { Users, Calendar, Receipt, BarChart3, Home, Menu, FileText } from 'lucide-react';
 
 const navigationItems = [
   {
@@ -29,6 +29,12 @@ const navigationItems = [
     href: '/billing',
     icon: Receipt,
     description: 'Factures et paiements'
+  },
+  {
+    title: 'Documents',
+    href: '/documents',
+    icon: FileText,
+    description: 'Documents et laboratoire'
   },
   {
     title: 'Rapports',

@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Calendar, Receipt, BarChart3, Activity, Plus } from "lucide-react";
+import { Users, Calendar, Receipt, BarChart3, Activity, FileText } from "lucide-react";
 import { GlobalSearch } from "@/components/common/GlobalSearch";
 
 const Index = () => {
@@ -21,7 +21,7 @@ const Index = () => {
           </h1>
           <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto mb-6 leading-relaxed">
             Une solution complète pour la gestion des patients, des rendez-vous, 
-            de la facturation et des rapports médicaux
+            de la facturation, des documents et des rapports médicaux
           </p>
           <div className="flex justify-center max-w-md mx-auto">
             <GlobalSearch />
@@ -29,7 +29,7 @@ const Index = () => {
         </div>
 
         {/* Modules principaux */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-12">
           <Link to="/patients" className="group">
             <Card className="medical-card h-full group-hover:scale-105 transition-transform duration-200">
               <CardHeader className="pb-4">
@@ -126,6 +126,38 @@ const Index = () => {
             </Card>
           </Link>
 
+          <Link to="/documents" className="group">
+            <Card className="medical-card h-full group-hover:scale-105 transition-transform duration-200">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                    <FileText className="h-6 w-6 text-indigo-600" />
+                  </div>
+                  <CardTitle className="text-lg text-gray-900">Documents</CardTitle>
+                </div>
+                <CardDescription className="text-gray-600">
+                  Gestion des documents et laboratoire
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></div>
+                    Documents médicaux
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></div>
+                    Résultats de laboratoire
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></div>
+                    Imagerie médicale
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </Link>
+
           <Link to="/reports" className="group">
             <Card className="medical-card h-full group-hover:scale-105 transition-transform duration-200">
               <CardHeader className="pb-4">
@@ -168,7 +200,7 @@ const Index = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               <Link to="/patients">
                 <Button className="medical-button w-full h-auto flex-col gap-2 py-4">
                   <Users className="h-6 w-6" />
@@ -185,6 +217,12 @@ const Index = () => {
                 <Button variant="outline" className="w-full h-auto flex-col gap-2 py-4 touch-target border-blue-200 text-blue-600 hover:bg-blue-50">
                   <Receipt className="h-6 w-6" />
                   <span className="text-sm font-medium">Nouvelle Facture</span>
+                </Button>
+              </Link>
+              <Link to="/documents">
+                <Button variant="outline" className="w-full h-auto flex-col gap-2 py-4 touch-target border-blue-200 text-blue-600 hover:bg-blue-50">
+                  <FileText className="h-6 w-6" />
+                  <span className="text-sm font-medium">Nouveau Document</span>
                 </Button>
               </Link>
               <Link to="/reports">
