@@ -19,7 +19,7 @@ export interface Invoice {
 
 export interface InvoiceItem {
   id: string;
-  type: 'consultation' | 'medication' | 'other';
+  type: 'consultation' | 'medication' | 'analysis' | 'medical_act' | 'other';
   description: string;
   quantity: number;
   unitPrice: number;

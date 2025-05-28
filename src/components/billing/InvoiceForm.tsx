@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -29,7 +28,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSuccess }) => {
   const { toast } = useToast();
   const [selectedPatient, setSelectedPatient] = useState<string>('');
   const [patientSearchOpen, setPatientSearchOpen] = useState(false);
-  const [dueDate, setDueDate] = useState<Date>(new Date()); // Date d'échéance par défaut = aujourd'hui
+  const [dueDate, setDueDate] = useState<Date>(new Date());
 
   const { register, handleSubmit, control, formState: { errors }, setValue, watch } = useForm<InvoiceFormData>({
     defaultValues: {
@@ -83,7 +82,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSuccess }) => {
       ...data,
       patientId: selectedPatient,
       items: invoiceItems,
-      date: new Date(), // Ajouter la date requise
+      date: new Date(),
       dueDate: dueDate,
     };
 
@@ -203,6 +202,8 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSuccess }) => {
                     <SelectContent>
                       <SelectItem value="consultation">Consultation</SelectItem>
                       <SelectItem value="medication">Médicament</SelectItem>
+                      <SelectItem value="analysis">Analyse</SelectItem>
+                      <SelectItem value="medical_act">Acte médical</SelectItem>
                       <SelectItem value="other">Autre</SelectItem>
                     </SelectContent>
                   </Select>
