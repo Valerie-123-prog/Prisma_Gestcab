@@ -4,6 +4,7 @@ import { DocumentsHeader } from '@/components/documents/DocumentsHeader';
 import { DocumentsStats } from '@/components/documents/DocumentsStats';
 import { DocumentsFilters } from '@/components/documents/DocumentsFilters';
 import { DocumentsList } from '@/components/documents/DocumentsList';
+import { DocumentFormModal } from '@/components/documents/DocumentFormModal';
 import { Document } from '@/types/document';
 
 const mockDocuments: Document[] = [
@@ -62,11 +63,24 @@ const mockDocuments: Document[] = [
 const Documents = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTab, setSelectedTab] = useState('all');
-  const [documents] = useState<Document[]>(mockDocuments);
+  const [documents, setDocuments] = useState<Document[]>(mockDocuments);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleNewDocument = () => {
-    console.log('Nouveau document clicked');
-    // Ici on pourrait ouvrir un modal ou naviguer vers une page de création
+    console.log('Opening new document modal');
+    setIsModalOpen(true);
+  };
+
+  const handleCreateDocument = (newDocumentData: Omit<Document, 'id' | 'date'>) => {
+    const newDocument: Document = {
+      ...newDocumentData,
+      id: Date.now().toString(),
+      date: new Date(),
+      size: newDocumentData.size || '1.0 MB'
+    };
+    
+    setDocuments(prev => [newDocument, ...prev]);
+    console.log('Document créé:', newDocument);
   };
 
   return (
@@ -86,6 +100,12 @@ const Documents = () => {
           searchTerm={searchTerm}
           selectedTab={selectedTab}
           onTabChange={setSelectedTab}
+        />
+
+        <DocumentFormModal
+          open={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          onSubmit={handleCreateDocument}
         />
       </div>
     </div>
