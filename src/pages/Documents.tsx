@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -135,143 +134,158 @@ const Documents = () => {
   const pendingTests = labDocuments.filter(doc => doc.labResults?.status === 'pending' || doc.labResults?.status === 'in-progress');
   const urgentTests = labDocuments.filter(doc => doc.labResults?.priority === 'urgent');
 
+  const handleNewDocument = () => {
+    console.log('Nouveau document clicked');
+    // Ici on pourrait ouvrir un modal ou naviguer vers une page de création
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
-      <div className="container mx-auto px-4 py-6 lg:py-8">
-        {/* En-tête */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
-          <div className="flex items-center gap-3 mb-4 lg:mb-0">
-            <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
-              <FileText className="h-6 w-6 text-white" />
+      <div className="container mx-auto px-2 sm:px-4 py-4 lg:py-8">
+        {/* En-tête optimisé mobile */}
+        <div className="flex flex-col space-y-4 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
+              <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Gestion des Documents</h1>
-              <p className="text-gray-600">Documents médicaux et résultats de laboratoire</p>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 truncate">Gestion des Documents</h1>
+              <p className="text-sm sm:text-base text-gray-600 truncate">Documents médicaux et résultats de laboratoire</p>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md">
-              <Plus className="h-4 w-4 mr-2" />
-              Nouveau Document
+          
+          {/* Boutons d'action - alignés à droite */}
+          <div className="flex justify-end gap-2">
+            <Button 
+              onClick={handleNewDocument}
+              className="bg-blue-600 hover:bg-blue-700 text-white shadow-md text-sm px-3 py-2 sm:px-4 sm:py-2"
+            >
+              <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Nouveau Document</span>
+              <span className="sm:hidden">Nouveau</span>
             </Button>
-            <Button variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50">
-              <Upload className="h-4 w-4 mr-2" />
-              Importer
+            <Button variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50 text-sm px-3 py-2 sm:px-4 sm:py-2">
+              <Upload className="h-4 w-4 mr-1 sm:mr-2" />
+              <span className="hidden sm:inline">Importer</span>
+              <span className="sm:hidden">Import</span>
             </Button>
           </div>
         </div>
 
-        {/* Statistiques du laboratoire */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Statistiques du laboratoire - responsive grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mb-6">
           <Card className="bg-white shadow-md hover:shadow-lg transition-shadow border-l-4 border-l-indigo-500">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 sm:pb-3">
               <div className="flex items-center gap-2">
-                <Microscope className="h-5 w-5 text-indigo-600" />
-                <CardTitle className="text-lg">Analyses en cours</CardTitle>
+                <Microscope className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600" />
+                <CardTitle className="text-base sm:text-lg">Analyses en cours</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-indigo-600 mb-1">{pendingTests.length}</div>
-              <p className="text-sm text-gray-600">Tests en attente de résultats</p>
+              <div className="text-2xl sm:text-3xl font-bold text-indigo-600 mb-1">{pendingTests.length}</div>
+              <p className="text-xs sm:text-sm text-gray-600">Tests en attente de résultats</p>
             </CardContent>
           </Card>
 
           <Card className="bg-white shadow-md hover:shadow-lg transition-shadow border-l-4 border-l-red-500">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 sm:pb-3">
               <div className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-red-600" />
-                <CardTitle className="text-lg">Tests urgents</CardTitle>
+                <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
+                <CardTitle className="text-base sm:text-lg">Tests urgents</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-red-600 mb-1">{urgentTests.length}</div>
-              <p className="text-sm text-gray-600">Priorité élevée</p>
+              <div className="text-2xl sm:text-3xl font-bold text-red-600 mb-1">{urgentTests.length}</div>
+              <p className="text-xs sm:text-sm text-gray-600">Priorité élevée</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white shadow-md hover:shadow-lg transition-shadow border-l-4 border-l-green-500">
-            <CardHeader className="pb-3">
+          <Card className="bg-white shadow-md hover:shadow-lg transition-shadow border-l-4 border-l-green-500 sm:col-span-2 lg:col-span-1">
+            <CardHeader className="pb-2 sm:pb-3">
               <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-green-600" />
-                <CardTitle className="text-lg">Total documents</CardTitle>
+                <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                <CardTitle className="text-base sm:text-lg">Total documents</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-600 mb-1">{documents.length}</div>
-              <p className="text-sm text-gray-600">Documents archivés</p>
+              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">{documents.length}</div>
+              <p className="text-xs sm:text-sm text-gray-600">Documents archivés</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Filtres et recherche */}
-        <Card className="bg-white shadow-md mb-6">
-          <CardHeader>
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        {/* Filtres et recherche - optimisé mobile */}
+        <Card className="bg-white shadow-md mb-4 sm:mb-6">
+          <CardHeader className="pb-3 sm:pb-4">
+            <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 sm:gap-4">
               <div className="flex-1">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    placeholder="Rechercher par nom de document ou patient..."
+                    placeholder="Rechercher..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 text-sm"
                   />
                 </div>
               </div>
-              <Button variant="outline" className="shrink-0 border-blue-200 text-blue-600 hover:bg-blue-50">
+              <Button variant="outline" className="shrink-0 border-blue-200 text-blue-600 hover:bg-blue-50 text-sm">
                 <Filter className="h-4 w-4 mr-2" />
-                Filtres avancés
+                <span className="hidden sm:inline">Filtres avancés</span>
+                <span className="sm:hidden">Filtres</span>
               </Button>
             </div>
           </CardHeader>
         </Card>
 
-        {/* Liste des documents avec onglets */}
+        {/* Liste des documents avec onglets - optimisé mobile */}
         <Card className="bg-white shadow-md">
-          <CardHeader>
-            <CardTitle>Documents et Résultats</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="text-lg sm:text-xl">Documents et Résultats</CardTitle>
+            <CardDescription className="text-sm">
               Gérez tous vos documents médicaux et résultats de laboratoire
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 text-xs sm:text-sm">
                 <TabsTrigger value="all">Tous</TabsTrigger>
-                <TabsTrigger value="lab">Laboratoire</TabsTrigger>
+                <TabsTrigger value="lab" className="hidden sm:block">Laboratoire</TabsTrigger>
+                <TabsTrigger value="lab" className="sm:hidden">Lab</TabsTrigger>
                 <TabsTrigger value="image">Imagerie</TabsTrigger>
-                <TabsTrigger value="medical">Médicaux</TabsTrigger>
-                <TabsTrigger value="prescription">Ordonnances</TabsTrigger>
+                <TabsTrigger value="medical" className="hidden sm:block">Médicaux</TabsTrigger>
+                <TabsTrigger value="medical" className="sm:hidden">Méd</TabsTrigger>
+                <TabsTrigger value="prescription" className="hidden sm:block">Ordonnances</TabsTrigger>
+                <TabsTrigger value="prescription" className="sm:hidden">Ord</TabsTrigger>
               </TabsList>
 
-              <TabsContent value={selectedTab} className="mt-6">
-                <div className="space-y-4">
+              <TabsContent value={selectedTab} className="mt-4 sm:mt-6">
+                <div className="space-y-3 sm:space-y-4">
                   {filteredDocuments.map((doc) => (
-                    <div key={doc.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 flex-1">
-                          <div className="p-2 bg-blue-100 rounded-lg">
+                    <div key={doc.id} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                        <div className="flex items-start gap-3 flex-1 min-w-0">
+                          <div className="p-2 bg-blue-100 rounded-lg shrink-0">
                             {getTypeIcon(doc.type)}
                           </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-medium text-gray-900">{doc.name}</h3>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
+                              <h3 className="font-medium text-gray-900 text-sm sm:text-base truncate">{doc.name}</h3>
                               {doc.labResults && (
-                                <Badge className={getPriorityColor(doc.labResults.priority)}>
+                                <Badge className={`${getPriorityColor(doc.labResults.priority)} text-xs shrink-0`}>
                                   {doc.labResults.priority === 'urgent' ? 'Urgent' : 'Normal'}
                                 </Badge>
                               )}
                             </div>
-                            <div className="flex items-center gap-4 text-sm text-gray-600">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs sm:text-sm text-gray-600">
                               <div className="flex items-center gap-1">
                                 <User className="h-3 w-3" />
-                                {doc.patientName}
+                                <span className="truncate">{doc.patientName}</span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <Calendar className="h-3 w-3" />
-                                {doc.date.toLocaleDateString('fr-FR')}
+                                <span>{doc.date.toLocaleDateString('fr-FR')}</span>
                               </div>
-                              <span>{doc.size}</span>
                               <span className="text-blue-600 font-medium">{doc.category}</span>
                             </div>
                             {doc.labResults && (
@@ -284,8 +298,8 @@ const Documents = () => {
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge className={getStatusColor(doc.status)}>
+                        <div className="flex items-center justify-between sm:justify-end gap-2">
+                          <Badge className={`${getStatusColor(doc.status)} text-xs`}>
                             {doc.status === 'completed' ? 'Terminé' : 
                              doc.status === 'pending' ? 'En attente' : 'Analysé'}
                           </Badge>
