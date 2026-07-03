@@ -65,7 +65,8 @@ export const BillingStats: React.FC = () => {
     invoices.filter(invoice => invoice.status === 'paid').forEach(invoice => {
       const method = invoice.paymentMethod || 'Non spécifié';
       const label = method === 'cash' ? 'Espèces' :
-                   method === 'mobile_money' ? 'Mobile Money' :
+                   method === 'orange_money' ? 'Orange Money' :
+                   method === 'mtn_mobile_money' ? 'MTN Mobile Money' :
                    method === 'check' ? 'Chèque' :
                    method === 'transfer' ? 'Virement' : 'Non spécifié';
       methodCounts[label] = (methodCounts[label] || 0) + 1;

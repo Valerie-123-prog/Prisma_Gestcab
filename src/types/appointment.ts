@@ -37,10 +37,10 @@ export interface TimeSlot {
 }
 
 export interface WorkingHours {
-  day: number; // 0-6 (dimanche-samedi)
+  dayOfWeek: number; // 0-6 (dimanche-samedi)
   startTime: string;
   endTime: string;
-  isWorking: boolean;
+  isActive: boolean;
 }
 
 export interface Holiday {
@@ -56,6 +56,6 @@ export interface WaitingListEntry {
   patientName: string;
   phoneNumber: string;
   consultationType: ConsultationType;
-  preferredDates: Date[];
+  preferredDates?: Date[];
   createdAt: Date;
 }

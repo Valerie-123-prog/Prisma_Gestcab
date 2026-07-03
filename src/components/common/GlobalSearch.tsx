@@ -16,7 +16,6 @@ interface SearchResult {
   type: 'patient' | 'appointment' | 'invoice';
   title: string;
   subtitle: string;
-  data: any;
 }
 
 export const GlobalSearch: React.FC = () => {
@@ -51,7 +50,6 @@ export const GlobalSearch: React.FC = () => {
           type: 'patient',
           title: `${patient.firstName} ${patient.lastName}`,
           subtitle: `${patient.phone} • ${patient.email || ''}`,
-          data: patient
         });
       }
     });
@@ -63,14 +61,13 @@ export const GlobalSearch: React.FC = () => {
         patient &&
         (patient.firstName.toLowerCase().includes(lowercaseQuery) ||
          patient.lastName.toLowerCase().includes(lowercaseQuery) ||
-         appointment.type.toLowerCase().includes(lowercaseQuery))
+         appointment.consultationType.name.toLowerCase().includes(lowercaseQuery))
       ) {
         searchResults.push({
           id: appointment.id,
           type: 'appointment',
-          title: `RDV ${appointment.type}`,
+          title: `RDV ${appointment.consultationType.name}`,
           subtitle: `${patient.firstName} ${patient.lastName} • ${appointment.date.toLocaleDateString()}`,
-          data: appointment
         });
       }
     });
@@ -86,7 +83,6 @@ export const GlobalSearch: React.FC = () => {
           type: 'invoice',
           title: `Facture ${invoice.invoiceNumber}`,
           subtitle: `${invoice.patientName} • ${invoice.total.toLocaleString()} FCFA`,
-          data: invoice
         });
       }
     });

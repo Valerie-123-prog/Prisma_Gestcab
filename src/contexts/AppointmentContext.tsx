@@ -1,6 +1,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Appointment, ConsultationType, TimeSlot, WorkingHours, Holiday, WaitingListEntry } from '@/types/appointment';
+import { loadFromStorage, saveToStorage } from '@/lib/storage';
+import { addMinutesToTime, timeRangesOverlap } from '@/lib/timeUtils';
 
 interface AppointmentContextType {
   appointments: Appointment[];
@@ -51,51 +53,32 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // Charger les données depuis localStorage
   useEffect(() => {
-    const savedAppointments = localStorage.getItem('appointments');
-    if (savedAppointments) {
-      const parsedAppointments = JSON.parse(savedAppointments, (key, value) => {
-        if (key === 'date' || key === 'createdAt' || key === 'updatedAt') {
-          return new Date(value);
-        }
-        return value;
-      });
-      setAppointments(parsedAppointments);
-    }
+    const savedAppointments = loadFromStorage<Appointment[]>('appointments', ['date', 'createdAt', 'updatedAt']);
+    if (savedAppointments) setAppointments(savedAppointments);
 
-    const savedHolidays = localStorage.getItem('holidays');
-    if (savedHolidays) {
-      const parsedHolidays = JSON.parse(savedHolidays, (key, value) => {
-        if (key === 'date') {
-          return new Date(value);
-        }
-        return value;
-      });
-      setHolidays(parsedHolidays);
-    }
+    const savedHolidays = loadFromStorage<Holiday[]>('holidays', ['date']);
+    if (savedHolidays) setHolidays(savedHolidays);
 
-    const savedWaitingList = localStorage.getItem('waitingList');
+    const savedWaitingList = loadFromStorage<WaitingListEntry[]>('waitingList', ['createdAt']);
     if (savedWaitingList) {
-      const parsedWaitingList = JSON.parse(savedWaitingList, (key, value) => {
-        if (key === 'preferredDate' || key === 'createdAt') {
-          return value ? new Date(value) : undefined;
-        }
-        return value;
-      });
-      setWaitingList(parsedWaitingList);
+      setWaitingList(savedWaitingList.map(entry => ({
+        ...entry,
+        preferredDates: entry.preferredDates?.map(date => new Date(date)),
+      })));
     }
   }, []);
 
   // Sauvegarder dans localStorage
   useEffect(() => {
-    localStorage.setItem('appointments', JSON.stringify(appointments));
+    saveToStorage('appointments', appointments);
   }, [appointments]);
 
   useEffect(() => {
-    localStorage.setItem('holidays', JSON.stringify(holidays));
+    saveToStorage('holidays', holidays);
   }, [holidays]);
 
   useEffect(() => {
-    localStorage.setItem('waitingList', JSON.stringify(waitingList));
+    saveToStorage('waitingList', waitingList);
   }, [waitingList]);
 
   const addAppointment = (appointmentData: Omit<Appointment, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -148,12 +131,13 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     while (currentTime < endTime) {
       const endSlotTime = addMinutesToTime(currentTime, duration);
       if (endSlotTime <= endTime) {
-        // Vérifier si le créneau est disponible
+        // Un créneau est indisponible dès qu'il chevauche un RDV existant,
+        // même partiellement (pas seulement si les heures de début coïncident)
         const isBooked = appointments.some(apt => {
           const aptDate = new Date(apt.date);
           return aptDate.toDateString() === date.toDateString() &&
-                 apt.startTime === currentTime &&
-                 apt.status !== 'cancelled';
+                 apt.status !== 'cancelled' &&
+                 timeRangesOverlap(currentTime, endSlotTime, apt.startTime, apt.endTime);
         });
 
         slots.push({
@@ -225,12 +209,3 @@ export const AppointmentProvider: React.FC<{ children: React.ReactNode }> = ({ c
     </AppointmentContext.Provider>
   );
 };
-
-// Fonction utilitaire pour ajouter des minutes à une heure
-function addMinutesToTime(time: string, minutes: number): string {
-  const [hours, mins] = time.split(':').map(Number);
-  const totalMinutes = hours * 60 + mins + minutes;
-  const newHours = Math.floor(totalMinutes / 60);
-  const newMins = totalMinutes % 60;
-  return `${String(newHours).padStart(2, '0')}:${String(newMins).padStart(2, '0')}`;
-}

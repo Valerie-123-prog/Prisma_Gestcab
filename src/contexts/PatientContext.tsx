@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Patient, Consultation, Treatment } from '@/types/patient';
+import { loadFromStorage, saveToStorage } from '@/lib/storage';
 
 interface PatientContextType {
   patients: Patient[];
@@ -28,21 +29,16 @@ export const PatientProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Charger les données depuis localStorage au démarrage
   useEffect(() => {
-    const savedPatients = localStorage.getItem('patients');
-    if (savedPatients) {
-      const parsedPatients = JSON.parse(savedPatients, (key, value) => {
-        if (key === 'dateOfBirth' || key === 'date' || key === 'startDate' || key === 'endDate' || key === 'createdAt' || key === 'updatedAt') {
-          return new Date(value);
-        }
-        return value;
-      });
-      setPatients(parsedPatients);
-    }
+    const savedPatients = loadFromStorage<Patient[]>(
+      'patients',
+      ['dateOfBirth', 'date', 'startDate', 'endDate', 'createdAt', 'updatedAt']
+    );
+    if (savedPatients) setPatients(savedPatients);
   }, []);
 
   // Sauvegarder dans localStorage à chaque changement
   useEffect(() => {
-    localStorage.setItem('patients', JSON.stringify(patients));
+    saveToStorage('patients', patients);
   }, [patients]);
 
   const addPatient = (patientData: Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>) => {

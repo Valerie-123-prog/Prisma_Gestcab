@@ -225,7 +225,7 @@ export const ActivityReports: React.FC = () => {
                 <div key={appointment.id} className="flex justify-between items-center py-2 border-b">
                   <div>
                     <div className="font-medium">
-                      RDV {appointment.type} - {patient?.firstName} {patient?.lastName}
+                      RDV {appointment.consultationType.name} - {patient?.firstName} {patient?.lastName}
                     </div>
                     <div className="text-sm text-gray-500">
                       {appointment.date.toLocaleDateString()} à {appointment.date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}

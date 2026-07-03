@@ -224,10 +224,11 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     switch (viewType) {
       case 'day':
         return formatDateLongFr(currentDate);
-      case 'week':
+      case 'week': {
         const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
         const weekEnd = addDays(weekStart, 6);
         return `${formatDateShortFr(weekStart)} - ${formatDateShortFr(weekEnd)}`;
+      }
       case 'month':
         return formatDateFr(currentDate, 'MMMM yyyy');
     }

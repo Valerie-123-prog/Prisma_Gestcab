@@ -15,6 +15,7 @@ import { formatDateFr } from '@/lib/dateUtils';
 import { useAppointments } from '@/contexts/AppointmentContext';
 import { usePatients } from '@/contexts/PatientContext';
 import { toast } from '@/hooks/use-toast';
+import { TimeSlot } from '@/types/appointment';
 
 const appointmentSchema = z.object({
   patientId: z.string().min(1, 'Veuillez sélectionner un patient'),
@@ -36,7 +37,7 @@ interface AppointmentFormProps {
 export const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSuccess, selectedPatientId }) => {
   const { addAppointment, consultationTypes, getAvailableSlots } = useAppointments();
   const { patients } = usePatients();
-  const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
 
   const form = useForm<AppointmentFormData>({
     resolver: zodResolver(appointmentSchema),

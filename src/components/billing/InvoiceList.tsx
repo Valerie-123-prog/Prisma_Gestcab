@@ -11,6 +11,7 @@ import { InvoiceDetail } from './InvoiceDetail';
 import { PaymentForm } from './PaymentForm';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useToast } from '@/hooks/use-toast';
 
 interface InvoiceListProps {
   invoices: Invoice[];
@@ -19,6 +20,7 @@ interface InvoiceListProps {
 
 export const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, showOnlyUnpaid = false }) => {
   const { deleteInvoice } = useBilling();
+  const { toast } = useToast();
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
@@ -47,8 +49,15 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, showOnlyUnpa
   };
 
   const handleDelete = (invoice: Invoice) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette facture ?')) {
-      deleteInvoice(invoice.id);
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette facture ?')) {
+      return;
+    }
+    if (!deleteInvoice(invoice.id)) {
+      toast({
+        title: 'Suppression impossible',
+        description: 'Cette facture a déjà reçu un paiement : elle fait partie de l\'historique comptable et ne peut pas être supprimée.',
+        variant: 'destructive',
+      });
     }
   };
 

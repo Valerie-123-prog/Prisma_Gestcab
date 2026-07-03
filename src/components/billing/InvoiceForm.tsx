@@ -194,7 +194,7 @@ export const InvoiceForm: React.FC<InvoiceFormProps> = ({ onSuccess }) => {
                   <Label>Type</Label>
                   <Select
                     value={watchedItems[index]?.type || 'other'}
-                    onValueChange={(value) => setValue(`items.${index}.type`, value as any)}
+                    onValueChange={(value) => setValue(`items.${index}.type`, value as InvoiceItem['type'])}
                   >
                     <SelectTrigger>
                       <SelectValue />

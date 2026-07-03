@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Invoice, Payment, BillingSettings, InvoiceItem } from '@/types/billing';
+import { Invoice, Payment, BillingSettings } from '@/types/billing';
 import { usePatients } from './PatientContext';
+import { loadFromStorage, saveToStorage } from '@/lib/storage';
+import { calculateInvoiceTotal, derivePaymentStatus, formatInvoiceNumber, getNextInvoiceNumber } from '@/lib/billingUtils';
 
 interface BillingContextType {
   invoices: Invoice[];
@@ -8,7 +10,8 @@ interface BillingContextType {
   settings: BillingSettings;
   addInvoice: (invoice: Omit<Invoice, 'id' | 'invoiceNumber' | 'subtotal' | 'total' | 'createdAt' | 'updatedAt' | 'status' | 'amountPaid' | 'patientName'>) => void;
   updateInvoice: (id: string, updates: Partial<Invoice>) => void;
-  deleteInvoice: (id: string) => void;
+  /** Refuse la suppression (renvoie false) si la facture a déjà reçu un paiement. */
+  deleteInvoice: (id: string) => boolean;
   getInvoice: (id: string) => Invoice | undefined;
   addPayment: (payment: Omit<Payment, 'id'>) => void;
   updateSettings: (settings: Partial<BillingSettings>) => void;
@@ -47,55 +50,33 @@ export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Charger les données depuis localStorage au démarrage
   useEffect(() => {
-    const savedInvoices = localStorage.getItem('invoices');
-    if (savedInvoices) {
-      const parsedInvoices = JSON.parse(savedInvoices, (key, value) => {
-        if (key === 'date' || key === 'dueDate' || key === 'createdAt' || key === 'updatedAt') {
-          return new Date(value);
-        }
-        return value;
-      });
-      setInvoices(parsedInvoices);
-    }
+    const savedInvoices = loadFromStorage<Invoice[]>('invoices', ['date', 'dueDate', 'createdAt', 'updatedAt']);
+    if (savedInvoices) setInvoices(savedInvoices);
 
-    const savedPayments = localStorage.getItem('payments');
-    if (savedPayments) {
-      const parsedPayments = JSON.parse(savedPayments, (key, value) => {
-        if (key === 'date') {
-          return new Date(value);
-        }
-        return value;
-      });
-      setPayments(parsedPayments);
-    }
+    const savedPayments = loadFromStorage<Payment[]>('payments', ['date']);
+    if (savedPayments) setPayments(savedPayments);
 
-    const savedSettings = localStorage.getItem('billingSettings');
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
-    }
+    const savedSettings = loadFromStorage<BillingSettings>('billingSettings');
+    if (savedSettings) setSettings(savedSettings);
   }, []);
 
   // Sauvegarder dans localStorage à chaque changement
   useEffect(() => {
-    localStorage.setItem('invoices', JSON.stringify(invoices));
+    saveToStorage('invoices', invoices);
   }, [invoices]);
 
   useEffect(() => {
-    localStorage.setItem('payments', JSON.stringify(payments));
+    saveToStorage('payments', payments);
   }, [payments]);
 
   useEffect(() => {
-    localStorage.setItem('billingSettings', JSON.stringify(settings));
+    saveToStorage('billingSettings', settings);
   }, [settings]);
 
-  const calculateInvoiceTotal = (items: InvoiceItem[]) => {
-    return items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
-  };
-
   const generateInvoiceNumber = () => {
-    const number = `${settings.invoicePrefix}-${settings.nextInvoiceNumber.toString().padStart(4, '0')}`;
-    setSettings(prev => ({ ...prev, nextInvoiceNumber: prev.nextInvoiceNumber + 1 }));
-    return number;
+    const nextNumber = getNextInvoiceNumber(invoices, settings.invoicePrefix, settings.nextInvoiceNumber);
+    setSettings(prev => ({ ...prev, nextInvoiceNumber: nextNumber + 1 }));
+    return formatInvoiceNumber(settings.invoicePrefix, nextNumber);
   };
 
   const addInvoice = (invoiceData: Omit<Invoice, 'id' | 'invoiceNumber' | 'subtotal' | 'total' | 'createdAt' | 'updatedAt' | 'status' | 'amountPaid' | 'patientName'>) => {
@@ -137,8 +118,13 @@ export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const deleteInvoice = (id: string) => {
+    // Une facture qui a reçu un paiement fait partie de l'historique comptable :
+    // elle ne doit pas pouvoir disparaître
+    if (payments.some(payment => payment.invoiceId === id)) {
+      return false;
+    }
     setInvoices(prev => prev.filter(invoice => invoice.id !== id));
-    setPayments(prev => prev.filter(payment => payment.invoiceId !== id));
+    return true;
   };
 
   const getInvoice = (id: string) => {
@@ -151,25 +137,20 @@ export const BillingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       id: crypto.randomUUID(),
     };
 
-    setPayments(prev => [...prev, newPayment]);
+    // La même liste sert à mettre à jour l'état ET à calculer le total payé,
+    // pour que le statut de la facture reste cohérent avec les paiements
+    const updatedPayments = [...payments, newPayment];
+    setPayments(updatedPayments);
 
-    // Mettre à jour le statut de la facture
     const invoice = getInvoice(paymentData.invoiceId);
     if (invoice) {
-      const totalPaid = payments
+      const totalPaid = updatedPayments
         .filter(p => p.invoiceId === paymentData.invoiceId)
-        .reduce((sum, p) => sum + p.amount, 0) + paymentData.amount;
-
-      let status: Invoice['status'] = 'unpaid';
-      if (totalPaid >= invoice.total) {
-        status = 'paid';
-      } else if (totalPaid > 0) {
-        status = 'partially_paid';
-      }
+        .reduce((sum, p) => sum + p.amount, 0);
 
       updateInvoice(paymentData.invoiceId, {
         amountPaid: totalPaid,
-        status,
+        status: derivePaymentStatus(totalPaid, invoice.total),
         paymentMethod: paymentData.method
       });
     }

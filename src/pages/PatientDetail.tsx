@@ -84,9 +84,14 @@ const PatientDetail = () => {
                     address: patient.address,
                     phone: patient.phone,
                     email: patient.email || '',
-                    emergencyContactName: patient.emergencyContact.name,
-                    emergencyContactPhone: patient.emergencyContact.phone,
-                    emergencyContactRelationship: patient.emergencyContact.relationship,
+                    emergencyContact: {
+                      name: patient.emergencyContact.name,
+                      phone: patient.emergencyContact.phone,
+                      relationship: patient.emergencyContact.relationship,
+                    },
+                    medicalHistory: patient.medicalHistory || '',
+                    allergies: patient.allergies || '',
+                    currentMedications: patient.currentMedications || '',
                     insuranceNumber: patient.insuranceNumber || '',
                   }}
                   onSuccess={() => setIsEditDialogOpen(false)}
