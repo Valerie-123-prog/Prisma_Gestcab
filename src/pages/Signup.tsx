@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Stethoscope } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,36 +8,46 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable';
 
-const Login = () => {
+const Signup = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: window.location.origin,
+        data: { first_name: firstName, last_name: lastName },
+      },
+    });
 
     setLoading(false);
 
     if (error) {
       toast({
-        title: 'Erreur de connexion',
-        description: error.message === 'Invalid login credentials'
-          ? 'Email ou mot de passe incorrect'
+        title: 'Erreur d\'inscription',
+        description: error.message === 'User already registered'
+          ? 'Un compte existe déjà avec cet email'
           : error.message,
         variant: 'destructive',
       });
       return;
     }
 
-    toast({ title: 'Connexion réussie', description: 'Bienvenue sur Prisma GestCab' });
-    navigate(from, { replace: true });
+    toast({
+      title: 'Inscription réussie',
+      description: 'Bienvenue sur Prisma GestCab !',
+    });
+    navigate('/', { replace: true });
   };
 
   const handleGoogleSignIn = async () => {
@@ -54,17 +64,40 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 py-8">
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full">
         <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-500 rounded-full mb-4">
             <Stethoscope className="h-8 w-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Prisma GestCab</h1>
-          <p className="text-gray-600 mt-2">Connectez-vous à votre compte</p>
+          <h1 className="text-2xl font-bold text-gray-900">Créer un compte</h1>
+          <p className="text-gray-600 mt-2">Rejoignez Prisma GestCab</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="firstName">Prénom</Label>
+              <Input
+                id="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="lastName">Nom</Label>
+              <Input
+                id="lastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+                className="mt-1"
+              />
+            </div>
+          </div>
+
           <div>
             <Label htmlFor="email">Email</Label>
             <Input
@@ -85,7 +118,8 @@ const Login = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Votre mot de passe"
+              placeholder="Au moins 6 caractères"
+              minLength={6}
               required
               className="mt-1"
             />
@@ -96,7 +130,7 @@ const Login = () => {
             disabled={loading}
             className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-medium"
           >
-            {loading ? 'Connexion...' : 'Se connecter'}
+            {loading ? 'Création...' : 'Créer mon compte'}
           </Button>
         </form>
 
@@ -125,15 +159,9 @@ const Login = () => {
         </Button>
 
         <div className="text-center mt-6 text-sm text-gray-600">
-          Pas encore de compte ?{' '}
-          <Link to="/signup" className="text-blue-600 hover:underline">
-            S'inscrire
-          </Link>
-        </div>
-
-        <div className="text-center mt-4">
-          <Link to="/" className="text-sm text-gray-500 hover:text-gray-700 hover:underline">
-            ← Retour à l'accueil
+          Déjà un compte ?{' '}
+          <Link to="/login" className="text-blue-600 hover:underline">
+            Se connecter
           </Link>
         </div>
       </div>
@@ -141,4 +169,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;
